@@ -1,3 +1,5 @@
+import TsClass as ts_class
+import TsType as ts_type
 import os
 
 print("JSON to Ts class converter.\n")
@@ -74,9 +76,8 @@ def convert(path):
     content = None
     if check_path(path):
         content = read_file(path)
-
+    root = ts_class.TsClass("root", ts_type.TsType.ts_types["object"])
+    x = ts_type.TsType.get_ts_types()
     if content is not None:
         del content
     return
-
-
