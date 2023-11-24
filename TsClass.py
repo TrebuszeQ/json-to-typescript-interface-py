@@ -82,3 +82,4 @@ class TsClass:
     __child = property(get_child, set_child)
     __children = None
     __parent = property(get_parent, set_parent)
+    #wrong?
