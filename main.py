@@ -1,8 +1,5 @@
-from TsClass import TsClass
-from TsType import TsType
 import os
-
-print("JSON to Ts class converter.\n")
+from converter import convert
 
 
 def input_loop():
@@ -13,49 +10,56 @@ def input_loop():
         print("Options:")
         print("0. Clear terminal.")
         print("1. Provide file path.")
-        print("2. Start.")
-        print("3. Exit.")
+        print("2. Convert.")
+        print("3. Exit.\n")
         try:
+            input_str = input("Choose option:\n")
             input_int = int(input_str)
         except ValueError:
             input_int = -1
         finally:
             match input_int:
+                # exception immune handling
                 case 0:
                     try:
-                        os.system("clear")
-                    except:
                         os.system("cls")
+
+                    except ...:
+                        os.system("clear")
                     break
 
                 case 1:
                     try:
-                        path = input("Provide path to JSON file.")
-                    except:
-                        print("Something went wrong.")
+                        path = input("Provide path to JSON file:\n")
+
+                    except ...:
+                        print("Input is wrong.\n")
                     break
 
                 case 2:
-                    if path is not None:
+                    if check_path(path):
                         try:
-                            convert(path)
+                            content = read_file(path)
+                            convert(content)
 
                         except FileNotFoundError:
-                            print("File doesn't exists.")
+                            print("File doesn't exists.\n")
+
                         except ReferenceError:
-                            print("File is not a JSON file.")
-                        except:
-                            print("Something went wrong")
+                            print("File is not a JSON file.\n")
+
+                        except ...:
+                            print("Something went wrong.\n")
 
                     elif path is None:
-                        print("Path is invalid.")
+                        print("Path is invalid.\n")
                     break
 
                 case 3:
-                    return
+                    exit(1)
 
                 case _:
-                    print("Wrong option")
+                    print("Wrong input provided.\n")
 
 
 def check_path(path):
@@ -72,20 +76,4 @@ def read_file(path):
         return content
 
 
-def convert(path):
-    content = None
-    if check_path(path):
-        content = read_file(path)
-    root = TsClass("root", TsType.get_type("object"), content, None)
-
-    current_object = root
-    previous_object = None
-
-    while True:
-        if current_object.__eq__(None):
-            value = current_object
-            #here
-
-    if content is not None:
-        del content
-    return
+input_loop()

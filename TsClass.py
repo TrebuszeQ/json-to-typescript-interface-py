@@ -1,4 +1,12 @@
 class TsClass:
+    __data_type = None
+    __class_name = None
+    __value = None
+    __initial_value = None
+    __child = None
+    __children = None
+    __parent = None
+
     def __init__(self, class_name, dtype, value, parent):
         self.__data_type = dtype
         self.__parent = parent
@@ -74,12 +82,3 @@ class TsClass:
                 if indice.__class_name.__eq__(class_name):
                     return True
         return False
-
-    __class_name = property(get_cname, set_cname)
-    __data_type = property(get_dtype, set_dtype)
-    __value = property(get_value, set_value)
-    __initial_value = property(get_initial_value, set_initial_value)
-    __child = property(get_child, set_child)
-    __children = None
-    __parent = property(get_parent, set_parent)
-    #wrong?
