@@ -36,19 +36,17 @@ def ret_data_type(type_string: str, field_name: str, value: str, opening: int) -
 
     if str.__len__(type_string) > 0:
         c = 0
-        while truth or c__le__(str.__len__(field_name)):
+        while truth or c.__le__(str.__len__(field_name)):
             char = type_string[c]
             match char:
                 case '[':
                     data_type = TsType.get_type("array")
                     closing_new = find_desired("]", value)
-                    truth = False
                     break
 
                 case "{":
                     data_type = TsType.get_type("object")
                     closing_new = find_desired("}", value)
-                    truth = False
                     break
 
                 case "f", "t":
@@ -56,27 +54,25 @@ def ret_data_type(type_string: str, field_name: str, value: str, opening: int) -
                         data_type = TsType.get_type("boolean")
                     else:
                         data_type = TsType.get_type("string")
-                    truth = False
                     break
 
                 case "n":
                     if type_string.__contains__("null"):
-                        truth = False
+                        data_type = TsType.get_type("null")
                     else:
                         data_type = TsType.get_type("string")
-                        truth = False
                     break
 
                 case _:
                     if str.isdigit(char):
                         data_type = TsType.get_type("number")
-                        truth = False
+                        break
                     elif str.isalpha(char):
                         data_type = TsType.get_type("string")
-                        truth = False
+                        break
                     else:
                         TsType.get_type("undefined")
-                    break
+
             c += 1
         opening += c
     return [data_type, closing_new, opening]
