@@ -1,4 +1,5 @@
 class FileCreator:
 
-    def create_files(self, obj):
+    @staticmethod
+    def create_files(obj):
         pass

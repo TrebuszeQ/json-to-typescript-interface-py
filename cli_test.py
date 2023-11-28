@@ -1,11 +1,13 @@
 import sys
 import unittest
 import io
-from cli import print_options
-from cli import input_loop
+from cli import Cli
+from TsClass import TsClass
 
 
 class TestMain(unittest.TestCase):
+    def setUp(self):
+        self._root = TsClass("root", "object", "lololololol", None)
 
     # tests if print_options prints to the console
     def test_print_options(self):
@@ -15,7 +17,7 @@ class TestMain(unittest.TestCase):
         buffer = io.StringIO()
         sys.stdout = buffer
         # execute output
-        print_options(options, message)
+        Cli.print_options(options, message)
 
         output = buffer.getvalue()
 
@@ -32,10 +34,16 @@ class TestMain(unittest.TestCase):
 
         self.assertTrue(truth)
 
-    def test_input_loop_case_1(self):
-        input_str = "1"
-        input_int = 1
-        pass
+    def test_delegate_case_1(self):
+        path = "/home/trebuszeq/Py/json-to-ts/test.json"
+
+        truth = Cli.delegate_input("", root=self._root)
+
+        print("output", str.__len__(output))
+        print("path", path)
+        self.assertEqual(path, output)
+
+
 
 
 if __name__ == '__main__':
