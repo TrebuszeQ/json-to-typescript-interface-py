@@ -18,13 +18,13 @@ class Cli:
 
     @staticmethod
     # returns content of the read file
-    def read_file(path):
+    def _read_file(path):
         with open(path) as file:
             return file.read(-1)
 
     @staticmethod
     # tries to take path from the user
-    def try_take_path():
+    def _try_take_path():
         path = None
 
         try:
@@ -33,28 +33,10 @@ class Cli:
             if path is None:
                 print("Path is None.\n")
 
-            else:
-                print("Path " + path + " is invalid.\n")
-
         except ...:
-            print("Input is wrong.\n")
+            print("Path " + path + " is invalid.\n")
 
         return path
-
-    @staticmethod
-    # tries to return converted root
-    def try_convert(content):
-        try:
-            root = convert(content)
-            return root
-
-        except ReferenceError:
-            print("Content is wrong.\n")
-
-        except ...:
-            print("Something went wrong.\n")
-
-        return None
 
     # change
     # matches input value to an action
@@ -87,18 +69,41 @@ class Cli:
 
     @staticmethod
     # checks if path exists and is JSON file.
-    def check_path(path):
+    def _check_path(path):
         truth = False
         try:
             if os.path.exists(path):
-                print("File doesn't exists.\n")
                 truth = True
 
+            else:
+                print("File doesn't exists.\n")
+
             if os.path.splitext(path)[1] != ".json":
-                print("File is not a JSON file.\n")
                 truth = False
+
+            else:
+                print("File is not a JSON file.\n")
 
         except ...:
             truth = False
+            print("Path is invalid\n")
 
-        return truth
+        if truth:
+            return path
+        else:
+            return False
+
+    @staticmethod
+    # tries to return converted root
+    def try_convert():
+        try:
+            root = convert(Cli._read_file(Cli._check_path(Cli._try_take_path())))
+            return root
+
+        except ReferenceError:
+            print("Content is wrong.\n")
+
+        except ...:
+            print("Something went wrong.\n")
+
+        return None

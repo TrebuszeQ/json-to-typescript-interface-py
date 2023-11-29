@@ -1,7 +1,7 @@
 import os
 from cli import Cli
 from file_creator import FileCreator
-import enum
+from TsClass import TsClass
 
 
 # tries to take number of option
@@ -20,29 +20,31 @@ def try_take_option():
 def main():
     input_str = ""
     input_int = 0
+    path = None
     content = None
     root = None
-    result = None
 
     # probably needs to be converted to class
     options = {
-        "Clear terminal": lambda: os.system("clear" if os.name == "posix" else "cls"),
-        "Provide file path": lambda: Cli.check_path(Cli.try_take_path()),
-        "Convert": lambda content_in: Cli.try_convert(content_in),
-        "Create files": lambda obj: FileCreator.create_files(obj),
-        "Exit": lambda: exit(1)
+        "Clear terminal": (lambda: os.system("clear" if os.name == "posix" else "cls")),
+        "Convert": (lambda: Cli.try_convert()),
+        "Create files": (lambda: FileCreator.create_files(root)),
+        "Exit": (lambda: exit(1))
     }
 
     while input_int.__ne__(options.__sizeof__() - 1):
         Cli.print_options(options.keys(), "Options:")
 
         option = try_take_option()
+        c = 0
 
-        if option.__eq__(-1):
-            print("Wrong input")
-        lol = repr(options.values())
-        lol[2]
-        options.values()
+        for key in options.keys():
+            if option.__eq__(c):
+                result = options.__getitem__(key)()
+                if type(result) is TsClass:
+                    root = result
+            c += 1
 
 
-main()
+if __name__.__eq__("__main__"):
+    main()
