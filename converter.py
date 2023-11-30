@@ -10,11 +10,9 @@ def trim_both_ends(value: str, closing: int):
         match char:
             case "{", "[", ",", "}", "]":
                 opening += 1
-                break
 
             case _:
-                field_name_cleared.join(char)
-                break
+                field_name_cleared += char
 
     return field_name_cleared
 
@@ -72,7 +70,6 @@ def ret_data_type(type_string: str, field_name: str, value: str, opening: int) -
                         break
                     else:
                         TsType.get_type("undefined")
-
             c += 1
         opening += c
     return [data_type, closing_new, opening]

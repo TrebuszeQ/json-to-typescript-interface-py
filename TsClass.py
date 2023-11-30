@@ -22,14 +22,15 @@ class TsClass:
         return self.__parent
 
     def set_child(self, child):
-        if child is None: self.__child = child
+        if child is None:
+            self.__child: TsClass = child
         elif child is not None and self.__children is None:
             self.init_children(child)
         elif child is not None and self.__children is not None:
             self.append_children(child)
 
     def init_children(self, child):
-        self.__children = list.__init__(child)
+        self.__children: list[TsClass] = list(child)
 
     def append_children(self, child):
         self.__children.__add__(child)

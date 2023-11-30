@@ -34,14 +34,11 @@ class TestMain(unittest.TestCase):
 
         self.assertTrue(truth)
 
-    def test_delegate_case_1(self):
-        path = "/home/trebuszeq/Py/json-to-ts/test.json"
+    def test_read_file(self, path: str):
+        exist = "/home/trebuszeq/Py/json-to-ts"
+        wrong_path = "nopath"
+        good_path = "/home/trebuszeq/Py/json-to-ts/test.json"
 
-        truth = Cli.delegate_input("", root=self._root)
-
-        print("output", str.__len__(output))
-        print("path", path)
-        self.assertEqual(path, output)
 
 
 

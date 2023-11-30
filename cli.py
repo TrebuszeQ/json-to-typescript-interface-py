@@ -97,7 +97,7 @@ class Cli:
     # tries to return converted root
     def try_convert():
         try:
-            root = convert(Cli._read_file(Cli._check_path(Cli._try_take_path())))
+            root = convert(Cli._read_file(Cli._check_path(Cli._try_take_path())).replace(" ", ""))
             return root
 
         except ReferenceError:
