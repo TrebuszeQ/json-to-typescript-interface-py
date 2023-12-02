@@ -2,7 +2,7 @@ from TsClass import TsClass
 from TsType import TsType
 
 
-def trim_both_ends(value: str, closing: int):
+def get_field_name(value: str, closing: int):
     field_name = value[0:closing]
     field_name_cleared = ""
     opening = 0
@@ -75,6 +75,40 @@ def ret_data_type(type_string: str, field_name: str, value: str, opening: int) -
     return [data_type, closing_new, opening]
 
 
+def recursive_convert(content):
+    pass
+
+
+def get_closing(char: chr, value: str):
+    closing = None
+    try:
+        closing = value.index(char)
+
+    except ...:
+        closing = str.__len__(value)
+
+    finally:
+        if closing <= 0:
+            closing = str.__len__(value)
+
+    return closing
+
+
+def get_new_val(value, opening, previous_object):
+    new_val = previous_object.get_value()
+    if value is None:
+        trim_end = str.__len__(new_val) - opening - 1
+        trim_start = opening + 1
+        new_val = new_val[trim_start: abs(trim_end)]
+
+    else:
+        trim_end = str.__len__(new_val) - str.__len__(value) - opening
+        trim_start = str.__len__(value) + opening
+        new_val = new_val[trim_start, abs(trim_end)]
+
+    return new_val
+
+# probably can be refactored for the better
 def convert(content):
 
     root = TsClass("root", TsType.get_type("object"), content, None)
@@ -83,27 +117,18 @@ def convert(content):
     previous_object = None
 
     while True:
-        if current_object.__ne__(None):
+        if current_object is not None:
             value = current_object.get_value()
-            while value.__ne__(None) and str.__len__(value).__gt__(0):
-                type_string = None
-                closing = 0
-                opening = 0
-                field_name = None
-                truth = None
-                data_type = None
-                closing_new = None
-                trim_end = None
-                trim_start = None
-                new_val = None
+            while value is not None and str.__len__(value).__gt__(0):
 
-                closing = value.index(":")
+                closing = get_closing(":", value)
+
                 if closing <= 0:
                     value = None
                     current_object.set_value(value)
                     break
 
-                field_name = trim_both_ends(value, closing)
+                field_name = get_field_name(value, closing)
 
                 if field_name is None:
                     value = None
@@ -120,16 +145,14 @@ def convert(content):
                 value = value[trim_start:abs(trim_end)]
                 current_object.set_value(value)
 
-                closing = value.index(",")
-                if closing <= 0:
-                    closing = str.__len__(value)
+                closing = get_closing(",", value)
 
                 type_string = value[0:abs(closing)]
 
                 data_type, closing_new, opening = ret_data_type(type_string, field_name, value, opening)
 
                 if closing_new.__eq__(-2):
-                    closing_new = find_desired(",")
+                    closing_new = find_desired(",", value)
 
                 if data_type.__eq__(TsType.get_type("object")) or data_type.__eq__(TsType.get_type("array")):
                     trim_end = closing_new - opening
@@ -138,26 +161,13 @@ def convert(content):
                     else:
                         value = None
 
-                    obj = TsClass(field_name, data_type, value, current_object)
-                    current_object.set_child(obj)
+                    current_object.set_child(TsClass(field_name, data_type, value, current_object))
 
-                    previous_object = current_object
-                    current_object = obj
+                    previous_object, current_object = current_object, TsClass(field_name, data_type, value, current_object)
+
                     current_object.set_parent(previous_object)
 
-                    # remove value of current object from previous object
-                    new_val = previous_object.get_value()
-                    if value is None:
-                        trim_end = str.__len__(new_val) - opening - 1
-                        trim_start = opening + 1
-                        new_val = new_val[trim_start: abs(trim_end)]
-
-                    else:
-                        trim_end = str.__len__(new_val) - str.__len__(value) - opening
-                        trim_start = str.__len__(value) + opening
-                        new_val = new_val[trim_start, abs(trim_end)]
-
-                    previous_object.set_value(new_val)
+                    previous_object.set_value(get_new_val(value, opening, previous_object))
                 else:
                     trim_end = str.__len__(value) - closing_new - 1
                     trim_start = closing_new + 1

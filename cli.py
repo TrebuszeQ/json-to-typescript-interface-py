@@ -17,12 +17,6 @@ class Cli:
             c += 1
 
     @staticmethod
-    # returns content of the read file
-    def _read_file(path):
-        with open(path) as file:
-            return file.read(-1)
-
-    @staticmethod
     # tries to take path from the user
     def _try_take_path():
         path = None
@@ -38,34 +32,11 @@ class Cli:
 
         return path
 
-    # change
-    # matches input value to an action
-    # @staticmethod
-    # def delegate_input(input_int, content, root):
-    #     match input_int:
-    #
-    #         case 0:
-    #             os.system("clear" if os.name == "posix" else "cls")
-    #
-    #         case 1:
-    #             return Cli.check_path(Cli.try_take_path())
-    #
-    #         case 2:
-    #             return Cli.try_convert(content)
-    #
-    #         case 3:
-    #             if root is not None:
-    #                 return FileCreator.create_files(root)
-    #             else:
-    #                 print("No JSON was converted.")
-    #                 return None
-    #
-    #         case 4:
-    #             exit(1)
-    #
-    #         case _:
-    #             print("Wrong input provided.\n")
-    #             return False
+    @staticmethod
+    # returns content of the read file
+    def _read_file(path):
+        with open(path) as file:
+            return file.read(-1)
 
     @staticmethod
     # checks if path exists and is JSON file.
@@ -74,15 +45,12 @@ class Cli:
         try:
             if os.path.exists(path):
                 truth = True
+                if os.path.splitext(path)[1].__ne__(".json"):
+                    truth = False
+                    print("File is not a JSON file.\n")
 
             else:
                 print("File doesn't exists.\n")
-
-            if os.path.splitext(path)[1] != ".json":
-                truth = False
-
-            else:
-                print("File is not a JSON file.\n")
 
         except ...:
             truth = False
@@ -95,15 +63,27 @@ class Cli:
 
     @staticmethod
     # tries to return converted root
-    def try_convert():
-        try:
-            root = convert(Cli._read_file(Cli._check_path(Cli._try_take_path())).replace(" ", ""))
-            return root
+    def try_convert(path):
+        content: str
+        if path is None:
+            content = Cli._read_file(Cli._check_path(Cli._try_take_path())).replace(" ", "")
 
-        except ReferenceError:
+        elif path is not None:
+            content = Cli._read_file(path).replace(" ", "")
+
+        truth = True
+        root = None
+        try:
+            root = convert(content)
+
+        except ReferenceError or BaseException:
             print("Content is wrong.\n")
+            truth = True
 
         except ...:
             print("Something went wrong.\n")
+            truth = True
 
+        if truth:
+            return root
         return None

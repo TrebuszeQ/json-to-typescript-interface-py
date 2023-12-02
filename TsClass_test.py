@@ -5,7 +5,7 @@ from TsClass import TsClass
 class TsClassCase(unittest.TestCase):
     def setUp(self):
         self._root = TsClass("root", "object", "lololololol", None)
-        self._path = "/home/trebuszeq/Py/json-to-ts/test.json"
+        self._path = "/poke_api.json"
 
     def test_is_ts_class(self):
         self.assertIsInstance(self._root, TsClass, "root is not instance of TsClass.")
