@@ -14,7 +14,7 @@ def get_field_name(value: str, closing: int):
             case _:
                 field_name_cleared += char
 
-    return field_name_cleared
+    return field_name_cleared, opening
 
 
 def find_desired(desired: str, value: str):
@@ -75,10 +75,6 @@ def ret_data_type(type_string: str, field_name: str, value: str, opening: int) -
     return [data_type, closing_new, opening]
 
 
-def recursive_convert(content):
-    pass
-
-
 def get_closing(char: chr, value: str):
     closing = None
     try:
@@ -108,48 +104,56 @@ def get_new_val(value, opening, previous_object):
 
     return new_val
 
-# probably can be refactored for the better
+
+def is_field_name_none(field_name):
+    if field_name is None:
+        change_value(None)
+
+
+def change_value(value):
+    return value
+
+
+def change_current_object_value(value, current_object):
+    current_object.set_value(value)
+
+
+# too broad scope
 def convert(content):
 
-    root = TsClass("root", TsType.get_type("object"), content, None)
-
-    current_object = root
+    current_object = TsClass("root", TsType.get_type("object"), content, None)
     previous_object = None
 
     while True:
         if current_object is not None:
-            value = current_object.get_value()
+            value = change_value(current_object.get_value())
             while value is not None and str.__len__(value).__gt__(0):
 
                 closing = get_closing(":", value)
 
                 if closing <= 0:
-                    value = None
-                    current_object.set_value(value)
+                    # side effect
+                    change_current_object_value(change_value(None), current_object)
                     break
 
-                field_name = get_field_name(value, closing)
+                field_name, opening = get_field_name(current_object.get_value(), closing)
 
                 if field_name is None:
-                    value = None
-                    current_object.set_value(value)
+                    # side effect
+                    change_current_object_value(change_value(None), current_object)
                     break
 
                 truth = current_object.is_child_present(field_name)
                 if truth:
-                    current_object.set_value(None)
+                    # side effect
+                    change_current_object_value(None, current_object)
                     break
 
                 trim_end = str.__len__(value) - closing - 1
-                trim_start = closing + 1
-                value = value[trim_start:abs(trim_end)]
-                current_object.set_value(value)
+                # side effect
+                change_current_object_value(change_value(value[(closing + 1):abs(trim_end)]), current_object)
 
-                closing = get_closing(",", value)
-
-                type_string = value[0:abs(closing)]
-
-                data_type, closing_new, opening = ret_data_type(type_string, field_name, value, opening)
+                data_type, closing_new, opening = ret_data_type(value[0:abs(get_closing(",", value))], field_name, current_object.get_value(), opening)
 
                 if closing_new.__eq__(-2):
                     closing_new = find_desired(",", value)
@@ -157,34 +161,38 @@ def convert(content):
                 if data_type.__eq__(TsType.get_type("object")) or data_type.__eq__(TsType.get_type("array")):
                     trim_end = closing_new - opening
                     if trim_end > 0:
-                        value = value[opening: abs(trim_end)]
+                        value = change_value(value[opening: abs(trim_end)])
                     else:
-                        value = None
+                        value = change_value(None)
 
+                    # side effect
                     current_object.set_child(TsClass(field_name, data_type, value, current_object))
 
                     previous_object, current_object = current_object, TsClass(field_name, data_type, value, current_object)
 
+                    # side effect
                     current_object.set_parent(previous_object)
 
+                    # side effect
                     previous_object.set_value(get_new_val(value, opening, previous_object))
                 else:
                     trim_end = str.__len__(value) - closing_new - 1
-                    trim_start = closing_new + 1
                     if trim_end < 0:
-                        value = None
+                        value = change_value(None)
                     else:
-                        value = value[trim_start:abs(trim_end)]
+                        value = change_value(value[(closing_new + 1):abs(trim_end)])
+                    # side effect
+                    change_current_object_value(value, current_object)
+                    # side effect
+                    current_object.set_child(TsClass(field_name, data_type, value[0:abs(closing)], current_object))
 
-                    current_object.set_value(value)
-
-                    obj = TsClass(field_name, data_type, type_string, current_object)
-                    current_object.set_child(obj)
         current_object = previous_object
+
         if current_object is None:
             break
         previous_object = current_object.get_parent()
 
     if content is not None:
         del content
-    return root
+
+    return current_object

@@ -64,6 +64,7 @@ class TsClass:
     def set_dtype(self, dtype):
         self.__data_type = dtype
 
+
     def get_value(self):
         return self.__value
 
