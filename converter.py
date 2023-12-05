@@ -107,15 +107,105 @@ def get_new_val(value, opening, previous_object):
 
 def is_field_name_none(field_name):
     if field_name is None:
-        change_value(None)
+        set_value(None)
 
 
-def change_value(value):
+def set_value(value):
     return value
 
 
 def change_current_object_value(value, current_object):
     current_object.set_value(value)
+
+
+def is_argument_none(arg):
+    if arg is None:
+        return True
+    else:
+        return False
+
+
+# todo
+def set_objects(data_type, trim_end, current_object, field_name):
+    if data_type.__eq__(TsType.get_type("object")) or data_type.__eq__(TsType.get_type("array")):
+
+        if trim_end > 0:
+            value = set_value(value[opening: abs(trim_end)])
+        else:
+            value = set_value(None)
+
+        # side effect
+        current_object.set_child(TsClass(field_name, data_type, value, current_object))
+
+        previous_object, current_object = current_object, TsClass(field_name, data_type, value, current_object)
+
+        # side effect
+        current_object.set_parent(previous_object)
+
+        # side effect
+        previous_object.set_value(get_new_val(value, opening, previous_object))
+    else:
+        trim_end = str.__len__(value) - closing_new - 1
+        if trim_end < 0:
+            value = set_value(None)
+        else:
+            value = set_value(value[(closing_new + 1):abs(trim_end)])
+
+        # side effect
+        change_current_object_value(value, current_object)
+
+        # side effect
+        current_object.set_child(TsClass(field_name, data_type, value[0:abs(closing)], current_object))
+
+
+# todo
+def traverse_over_value(value):
+    while value is not None and str.__len__(value).__gt__(0):
+        closing = get_closing(":", value)
+
+        if closing <= 0:
+            # side effect
+            change_current_object_value(set_value(None), current_object)
+            break
+
+        field_name, opening = get_field_name(current_object.get_value(), closing)
+
+        if is_argument_none(field_name).__eq__(True):
+            # side effect
+            change_current_object_value(set_value(None), current_object)
+            break
+
+        if current_object.is_child_present(field_name):
+            # side effect
+            change_current_object_value(None, current_object)
+            break
+
+        trim_end = str.__len__(value) - closing - 1
+        # side effect
+        change_current_object_value(set_value(value[(closing + 1):abs(trim_end)]), current_object)
+
+        data_type, closing_new, opening = ret_data_type(value[0:abs(get_closing(",", value))], field_name,
+                                                        current_object.get_value(), opening)
+
+        if closing_new.__eq__(-2):
+            closing_new = find_desired(",", value)
+
+        trim_end = closing_new - opening
+        set_objects(trim_end, )
+
+
+# todo
+def switch_objects_recursive(current_object, previous_object):
+    if is_argument_none(current_object).__eq__(True):
+        traverse_over_value(set_value(current_object.get_value()))
+
+        current_object = previous_object
+
+        if is_argument_none(current_object).__eq__(True):
+            return current_object
+
+        else:
+            switch_objects_recursive(current_object, current_object.get_parent())
 
 
 # too broad scope
@@ -125,33 +215,32 @@ def convert(content):
     previous_object = None
 
     while True:
-        if current_object is not None:
-            value = change_value(current_object.get_value())
-            while value is not None and str.__len__(value).__gt__(0):
+        if is_argument_none(current_object).__eq__(True):
+            value = set_value(current_object.get_value())
 
+            while value is not None and str.__len__(value).__gt__(0):
                 closing = get_closing(":", value)
 
                 if closing <= 0:
                     # side effect
-                    change_current_object_value(change_value(None), current_object)
+                    change_current_object_value(set_value(None), current_object)
                     break
 
                 field_name, opening = get_field_name(current_object.get_value(), closing)
 
-                if field_name is None:
+                if is_argument_none(field_name).__eq__(True):
                     # side effect
-                    change_current_object_value(change_value(None), current_object)
+                    change_current_object_value(set_value(None), current_object)
                     break
 
-                truth = current_object.is_child_present(field_name)
-                if truth:
+                if current_object.is_child_present(field_name):
                     # side effect
                     change_current_object_value(None, current_object)
                     break
 
                 trim_end = str.__len__(value) - closing - 1
                 # side effect
-                change_current_object_value(change_value(value[(closing + 1):abs(trim_end)]), current_object)
+                change_current_object_value(set_value(value[(closing + 1):abs(trim_end)]), current_object)
 
                 data_type, closing_new, opening = ret_data_type(value[0:abs(get_closing(",", value))], field_name, current_object.get_value(), opening)
 
@@ -161,9 +250,9 @@ def convert(content):
                 if data_type.__eq__(TsType.get_type("object")) or data_type.__eq__(TsType.get_type("array")):
                     trim_end = closing_new - opening
                     if trim_end > 0:
-                        value = change_value(value[opening: abs(trim_end)])
+                        value = set_value(value[opening: abs(trim_end)])
                     else:
-                        value = change_value(None)
+                        value = set_value(None)
 
                     # side effect
                     current_object.set_child(TsClass(field_name, data_type, value, current_object))
@@ -178,9 +267,9 @@ def convert(content):
                 else:
                     trim_end = str.__len__(value) - closing_new - 1
                     if trim_end < 0:
-                        value = change_value(None)
+                        value = set_value(None)
                     else:
-                        value = change_value(value[(closing_new + 1):abs(trim_end)])
+                        value = set_value(value[(closing_new + 1):abs(trim_end)])
                     # side effect
                     change_current_object_value(value, current_object)
                     # side effect
